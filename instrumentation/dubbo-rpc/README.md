@@ -43,7 +43,7 @@ tracing by creating and registering an extension factory:
 package com.yourcompany.dubbo;
 
 import brave.Tracing;
-import com.alibaba.dubbo.common.extension.ExtensionFactory;
+import org.apache.dubbo.common.extension.ExtensionFactory;
 import zipkin2.reporter.AsyncReporter;
 import zipkin2.Span;
 
@@ -63,7 +63,7 @@ public class TracingExtensionFactory implements ExtensionFactory {
 ```
 
 #### Register that factory using META-INF
-Make sure the following line is in `META-INF/dubbo/com.alibaba.dubbo.common.extension.ExtensionFactory` in your classpath:
+Make sure the following line is in `META-INF/dubbo/org.apache.dubbo.common.extension.ExtensionFactory` in your classpath:
 ```
 tracing=com.yourcompany.dubbo.TracingExtensionFactory
 ```

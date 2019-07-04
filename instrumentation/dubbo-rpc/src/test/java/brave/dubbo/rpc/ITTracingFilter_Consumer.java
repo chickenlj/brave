@@ -17,6 +17,8 @@ import brave.ScopedSpan;
 import brave.propagation.TraceContext;
 import brave.propagation.TraceContextOrSamplingFlags;
 import brave.sampler.Sampler;
+
+import org.apache.dubbo.common.constants.CommonConstants;
 import org.apache.dubbo.config.ApplicationConfig;
 import org.apache.dubbo.config.ReferenceConfig;
 import org.apache.dubbo.rpc.RpcContext;
@@ -27,6 +29,7 @@ import org.junit.Before;
 import org.junit.Test;
 import zipkin2.Span;
 
+import static org.apache.dubbo.rpc.Constants.RETURN_KEY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
 
@@ -37,7 +40,7 @@ public class ITTracingFilter_Consumer extends ITTracingFilter {
     server.start();
 
     client = new ReferenceConfig<>();
-    client.setApplication(new ApplicationConfig("bean-consumer"));
+    client.setApplication(new ApplicationConfig("brave-ut"));
     client.setFilter("tracing");
     client.setInterface(GreeterService.class);
     client.setUrl("dubbo://" + server.ip() + ":" + server.port() + "?scope=remote&generic=bean");
@@ -159,13 +162,15 @@ public class ITTracingFilter_Consumer extends ITTracingFilter {
   }
 
   @Test public void flushesSpanOneWay() throws Exception {
-    RpcContext.getContext().asyncCall(() -> {
+    RpcContext context = RpcContext.getContext();
+    context.setAttachment(RETURN_KEY, "false");
+    context.asyncCall(() -> {
       client.get().sayHello("romeo");
     });
 
     Span span = takeSpan();
     assertThat(span.duration())
-        .isNull();
+        .isNotNull();
   }
 
   @Test public void addsErrorTag_onUnimplemented() throws Exception {

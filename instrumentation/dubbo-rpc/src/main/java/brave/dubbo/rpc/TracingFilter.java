@@ -33,7 +33,7 @@ import org.apache.dubbo.rpc.Result;
 import org.apache.dubbo.rpc.RpcContext;
 import org.apache.dubbo.rpc.RpcException;
 
-import com.alibaba.dubbo.rpc.support.RpcUtils;
+import org.apache.dubbo.rpc.support.RpcUtils;
 import java.net.InetSocketAddress;
 import java.util.Map;
 
@@ -83,14 +83,11 @@ public final class TracingFilter implements Filter {
       span.start();
     }
 
-    boolean isOneway = false;
     try (Tracer.SpanInScope scope = tracer.withSpanInScope(span)) {
       Result result = invoker.invoke(invocation);
       if (result.hasException()) {
         onError(result.getException(), span);
       }
-
-      isOneway = RpcUtils.isOneway(invoker.getUrl(), invocation);
 
       result.whenComplete((v, t) -> {
         if (t != null) {
@@ -102,11 +99,8 @@ public final class TracingFilter implements Filter {
       return result;
     } catch (Error | RuntimeException e) {
       onError(e, span);
+      span.finish();
       throw e;
-    } finally {
-      if (isOneway) {
-        span.flush();
-      }
     }
   }
 

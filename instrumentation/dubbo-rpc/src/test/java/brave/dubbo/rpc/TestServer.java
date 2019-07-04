@@ -46,7 +46,7 @@ class TestServer {
       System.setProperty(DUBBO_IP_TO_REGISTRY, linkLocalIp);
     }
     service = new ServiceConfig<>();
-    service.setApplication(new ApplicationConfig("bean-provider"));
+    service.setApplication(new ApplicationConfig("brave-ut"));
     service.setRegistry(new RegistryConfig(RegistryConfig.NO_AVAILABLE));
     service.setProtocol(new ProtocolConfig("dubbo", PickUnusedPort.get()));
     service.setInterface(GreeterService.class.getName());
